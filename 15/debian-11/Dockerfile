@@ -21,6 +21,18 @@ RUN curl -sLO https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.
     echo "dfab5506104447eef2530d1adb9840ee3a67f30caaad5e9bcb8743ef2f9421bd  wkhtmltox_0.12.5-1.buster_amd64.deb" | sha256sum -c - && \
     dpkg -i wkhtmltox_0.12.5-1.buster_amd64.deb && \
     rm wkhtmltox_0.12.5-1.buster_amd64.deb
+    
+# Requirements for Argentine location
+RUN curl -o requirements.txt https://raw.githubusercontent.com/juandanielp24/odoo-argentina/main/requirements.txt \
+    && pip3 install -r requirements.txt \
+    && rm requirements.txt
+    
+# Fix permissions
+RUN set -x; \
+    mkdir /usr/local/lib/python3.8/dist-packages/pyafipws/cache \
+    && chown www-data -R /usr/local/lib/python3.8/dist-packages/pyafipws \
+    && chmod a+xr -R /usr/local/lib/python3.8/dist-packages/pyafipws \
+    && chmod a+xwrt -R /usr/local/lib/python3.8/dist-packages/pyafipws/cache
 
 COPY rootfs /
 RUN /opt/bitnami/scripts/odoo/postunpack.sh
